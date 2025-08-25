@@ -5,12 +5,12 @@ import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
-import io.micronaut.data.repository.PageableRepository;
 
 import java.util.List;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-public interface CatRepository extends PageableRepository<Cat, Long>, CrudRepository<Cat, Long> {
+public interface CatRepository extends CrudRepository<Cat, Long> {
+
     List<Cat> findByBreedPk(Long breedPk);
 
     @Query("""

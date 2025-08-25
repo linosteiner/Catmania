@@ -13,8 +13,6 @@ import java.util.Optional;
 public interface BehaviourRepository extends CrudRepository<Behaviour, Long> {
     Optional<Behaviour> findByName(String name);
 
-    @Query("""
-            SELECT b.* FROM behaviour b JOIN cat_behaviour cb ON cb.fk_behaviour = b.pk WHERE cb.fk_cat = :catId
-            """)
+    @Query("SELECT b.* FROM behaviour b JOIN cat_behaviour cb ON cb.fk_behaviour = b.pk WHERE cb.fk_cat = :catId")
     List<Behaviour> findBehaviorsOf(Long catId);
 }
