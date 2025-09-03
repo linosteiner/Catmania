@@ -6,10 +6,28 @@ import io.micronaut.data.model.query.builder.sql.Dialect;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 public interface CatFriendshipRepository {
-    @Query("INSERT INTO cat_friendship (fk_cat, fk_friend) VALUES (:fkCat, :fkFriend) ON CONFLICT DO NOTHING")
-    void add(long fkCat, long fkFriend);
 
-    @Query("DELETE FROM cat_friendship WHERE (fk_cat = :a AND fk_friend = :b) OR (fk_cat = :b AND fk_friend = :a)")
+    // Store normalized pair (min, max)
+    @Query("""
+                INSERT INTO cat_friendship (cat_id, friend_id)
+                VALUES (LEAST(:a, :b), GREATEST(:a, :b))
+                ON CONFLICT DO NOTHING
+            """)
+    void add(long a, long b);
+
+    @Query("""
+                DELETE FROM cat_friendship
+                WHERE cat_id = LEAST(:a, :b) AND friend_id = GREATEST(:a, :b)
+            """)
     void deletePair(long a, long b);
 
+    // Friends as Cat rows
+    @Query("""
+                SELECT c.* FROM cat c
+                JOIN cat_friendship f
+                  ON (f.cat_id = :id AND c.id = f.friend_id)
+                  OR (f.friend_id = :id AND c.id = f.cat_id)
+                ORDER BY c.id
+            """)
+    java.util.List<ch.linosteiner.catmania.entities.Cat> findFriendsOf(long id);
 }

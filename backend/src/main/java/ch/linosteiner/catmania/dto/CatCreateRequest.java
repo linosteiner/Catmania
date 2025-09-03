@@ -13,7 +13,7 @@ import java.util.List;
 public record CatCreateRequest(
         @NotBlank String name,
         @PastOrPresent LocalDate birthDate,
-        @Positive Long fkBreed,
-        List<@Positive Long> behaviourPks
+        @Positive Long id_breed,
+        List<@Positive Long> behaviourIds
 ) {
 }

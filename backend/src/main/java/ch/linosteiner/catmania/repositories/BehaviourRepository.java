@@ -7,10 +7,25 @@ import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 public interface BehaviourRepository extends CrudRepository<Behaviour, Long> {
-    @Query("SELECT b.* FROM behaviour b JOIN cat_behaviour cb ON cb.fk_behaviour = b.pk WHERE cb.fk_cat = :catId")
-    List<Behaviour> findBehavioursOf(Long catId);
+
+    @Query("""
+        SELECT cb.cat_id AS cat_id, b.name AS name
+        FROM cat_behaviour cb
+        JOIN behaviour b ON b.id = cb.behaviour_id
+        WHERE cb.cat_id IN (:catIds)
+        ORDER BY cb.cat_id, b.name
+    """)
+    List<BehaviourNameRow> findNamesByCatIds(List<Long> catIds);
+
+    @Query("""
+        SELECT b.*
+        FROM behaviour b
+        JOIN cat_behaviour cb ON cb.behaviour_id = b.id
+        WHERE cb.cat_id = :catId
+        ORDER BY b.name
+    """)
+    List<Behaviour> findByCatId(Long catId);
 }

@@ -13,6 +13,6 @@ public record CatUpdateRequest(
         @NotBlank String name,
         @PastOrPresent LocalDate birthDate,
         @Positive Long fkBreed,
-        List<@Positive Long> behaviourPks
+        List<@Positive Long> behaviourIds
 ) {
 }
