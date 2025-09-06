@@ -1,13 +1,14 @@
 package ch.linosteiner.catmania.repositories;
 
+import ch.linosteiner.catmania.entities.Cat;
 import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.CrudRepository;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-public interface CatFriendshipRepository {
+public interface CatFriendshipRepository extends CrudRepository<Cat, Long> {
 
-    // Store normalized pair (min, max)
     @Query("""
                 INSERT INTO cat_friendship (cat_id, friend_id)
                 VALUES (LEAST(:a, :b), GREATEST(:a, :b))
@@ -21,7 +22,6 @@ public interface CatFriendshipRepository {
             """)
     void deletePair(long a, long b);
 
-    // Friends as Cat rows
     @Query("""
                 SELECT c.* FROM cat c
                 JOIN cat_friendship f

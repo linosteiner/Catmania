@@ -12,9 +12,14 @@ import java.util.List;
 @Controller("/api/breeds")
 public class BreedController {
     private final BreedRepository repo;
-    public BreedController(BreedRepository repo) { this.repo = repo; }
+
+    public BreedController(BreedRepository repo) {
+        this.repo = repo;
+    }
 
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Get
-    public List<Breed> list() { return repo.findAll(); }
+    public List<Breed> list() {
+        return repo.findAll();
+    }
 }

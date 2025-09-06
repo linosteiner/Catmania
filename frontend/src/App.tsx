@@ -48,8 +48,7 @@ export default function App() {
             <CssBaseline/>
             <Container sx={{py: 3}}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h4" gutterBottom>Catmania</Typography>
-
+                    <Typography variant="h2" gutterBottom>Catmania</Typography>
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
                             <IconButton onClick={toggleMode} size="large">

@@ -135,7 +135,7 @@ public class CatService {
     public void addFriend(long aId, long bId) {
         assertCatExists(aId);
         assertCatExists(bId);
-        if (aId == bId) return; // ignore self
+        if (aId == bId) return;
         catFriendshipRepository.add(aId, bId);
     }
 

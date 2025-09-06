@@ -3,7 +3,7 @@ import type {CatItem} from './useCats.ts'
 import {authHeader} from "../auth.ts";
 
 async function fetchJson<T>(url: string): Promise<T> {
-    const res = await fetch(url, { headers: { Accept: 'application/json', ...authHeader() }})
+    const res = await fetch(url, {headers: {Accept: 'application/json', ...authHeader()}})
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
     return res.json()
 }

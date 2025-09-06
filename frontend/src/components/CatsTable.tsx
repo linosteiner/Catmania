@@ -15,10 +15,10 @@ import {
     TableSortLabel,
     Tooltip
 } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
 import InfoIcon from '@mui/icons-material/Info'
-import AddIcon from '@mui/icons-material/Add'
+import PetsIcon from '@mui/icons-material/Pets';
 import * as React from 'react'
 import {useDeleteCat} from '../hooks/mutations'
 import {CatFormDialog} from './CatFormDialog'
@@ -231,7 +231,7 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
             <Stack direction="row" justifyContent="space-between" sx={{mb: 1}} paddingTop={1}>
                 <div/>
                 {isAuthed && (
-                    <Button startIcon={<AddIcon/>} variant="contained" onClick={() => {
+                    <Button startIcon={<PetsIcon/>} variant="contained" onClick={() => {
                         setEditRow(null);
                         setOpenForm(true)
                     }}>

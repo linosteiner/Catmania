@@ -2,6 +2,20 @@ import {Box, Chip, Drawer, IconButton, Stack, Typography} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import {useCat, useCatBehaviours, useCatFriends} from '../hooks/useCatDetail'
 
+function formatDate(val?: string | null) {
+    if (!val) return '—'
+    const m = String(val).match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+    if (m) return val
+    try {
+        const d = new Date(val)
+        if (!Number.isNaN(+d)) {
+            return new Intl.DateTimeFormat('de-CH', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(d)
+        }
+    } catch {
+    }
+    return val || '—'
+}
+
 export function CatDetailDrawer({id, open, onClose}: { id?: number, open: boolean, onClose: () => void }) {
     const {data: cat} = useCat(id)
     const {data: behaviours = []} = useCatBehaviours(id)
@@ -19,7 +33,7 @@ export function CatDetailDrawer({id, open, onClose}: { id?: number, open: boolea
                 <Typography sx={{mb: 2}}>{cat?.name ?? '—'}</Typography>
 
                 <Typography variant="subtitle2">Birth date</Typography>
-                <Typography sx={{mb: 2}}>{cat?.birthDate ?? '—'}</Typography>
+                <Typography sx={{mb: 2}}>{formatDate(cat?.birthDate)}</Typography>
 
                 <Typography variant="subtitle2">Breed</Typography>
                 <Typography sx={{mb: 2}}>{cat?.breedName ?? '—'}</Typography>

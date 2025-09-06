@@ -3,11 +3,8 @@ package ch.linosteiner.catmania.entities;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.Relation;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.Set;
 
 @Serdeable
 @MappedEntity("behaviour")

@@ -43,7 +43,6 @@ public class PasswordHasher {
     public enum Mode {PLAIN, SHA256}
 
     public interface Hasher {
-        String encode(String raw);
 
         boolean matches(String raw, String stored);
     }
