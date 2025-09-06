@@ -10,6 +10,8 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.validation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -45,6 +47,7 @@ public class CatController {
                 .toList();
     }
 
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get
     public List<CatItem> listCats(@QueryValue Optional<@Positive Long> breedId,
                                   @QueryValue Optional<@Positive Long> behaviourId) {
@@ -52,7 +55,7 @@ public class CatController {
     }
 
 
-
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/{id}")
     public CatItem getCat(@PathVariable @Positive Long id) {
         Cat cat = catService.getCat(id);
@@ -60,6 +63,7 @@ public class CatController {
         return toItem(cat, map.getOrDefault(cat.getId(), List.of()));
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Post
     public HttpResponse<CatItem> createCat(@Valid @Body CatCreateRequest request) {
         Cat cat = catService.createCat(request);
@@ -73,6 +77,7 @@ public class CatController {
     }
 
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Patch("/{id}")
     public CatItem updateCat(@PathVariable @jakarta.validation.constraints.Positive Long id,
                              @Valid @Body CatUpdateRequest request) {
@@ -84,17 +89,20 @@ public class CatController {
         return toItem(cat, behaviours);
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Delete("/{id}")
     @Status(HttpStatus.NO_CONTENT)
     public void deleteCat(@PathVariable @Positive Long id) {
         catService.deleteCat(id);
     }
 
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/{id}/friends")
     public List<CatItem> friendsOf(@PathVariable @Positive Long id) {
         return toItems(catService.friendsOf(id));
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Put("/{id}/friends/{friendId}")
     @Status(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable @Positive Long id,
@@ -102,6 +110,7 @@ public class CatController {
         catService.addFriend(id, friendId);
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Delete("/{id}/friends/{friendId}")
     @Status(HttpStatus.NO_CONTENT)
     public void removeFriend(@PathVariable @Positive Long id,
@@ -109,11 +118,13 @@ public class CatController {
         catService.removeFriend(id, friendId);
     }
 
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get("/{id}/behaviours")
     public List<Behaviour> behavioursOf(@PathVariable @Positive Long id) {
         return catService.behavioursOf(id);
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Put("/{id}/behaviours/{behaviourId}")
     @Status(HttpStatus.NO_CONTENT)
     public void addBehaviour(@PathVariable @Positive Long id,
@@ -121,6 +132,7 @@ public class CatController {
         catService.addBehaviour(id, behaviourId);
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Delete("/{id}/behaviours/{behaviourId}")
     @Status(HttpStatus.NO_CONTENT)
     public void removeBehaviour(@PathVariable @Positive Long id,
@@ -128,6 +140,7 @@ public class CatController {
         catService.removeBehaviour(id, behaviourId);
     }
 
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Delete("/{id}/behaviours")
     @Status(HttpStatus.NO_CONTENT)
     public void removeAllBehaviours(@PathVariable @Positive Long id) {

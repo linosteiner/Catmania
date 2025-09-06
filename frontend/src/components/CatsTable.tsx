@@ -1,24 +1,35 @@
 import {useCats} from '../hooks/useCats'
 import {
-    CircularProgress, Paper, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Alert, IconButton, Tooltip, Stack, Button, TableSortLabel
+    Alert,
+    Button,
+    CircularProgress,
+    IconButton,
+    Paper,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TableSortLabel,
+    Tooltip
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import InfoIcon from '@mui/icons-material/Info'
 import AddIcon from '@mui/icons-material/Add'
 import * as React from 'react'
-import { useDeleteCat } from '../hooks/mutations'
-import { CatFormDialog } from './CatFormDialog'
-import { CatDetailDrawer } from './CatDetailDrawer'
-import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
+import {useDeleteCat} from '../hooks/mutations'
+import {CatFormDialog} from './CatFormDialog'
+import {CatDetailDrawer} from './CatDetailDrawer'
+import {ConfirmDeleteDialog} from './ConfirmDeleteDialog'
 
-// If you have the CatItem type exported from useCats, you can import it.
-// import type { CatItem } from '../hooks/useCats'
+import {getToken} from '../auth'
+import {useQueryClient} from '@tanstack/react-query'
 
 type Order = 'asc' | 'desc'
 
-// Local copy of the shape we need for sorting (adjust if you import CatItem)
 type CatRow = {
     id: number
     name: string
@@ -31,13 +42,13 @@ function formatDate(iso?: string | null) {
     if (!iso) return '—'
     try {
         const d = new Date(iso)
-        return new Intl.DateTimeFormat('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+        return new Intl.DateTimeFormat('de-CH', {day: '2-digit', month: '2-digit', year: 'numeric'}).format(d)
     } catch {
         return iso || '—'
     }
 }
 
-function makeBehavioursText(bhs: {name: string}[]) {
+function makeBehavioursText(bhs: { name: string }[]) {
     if (!bhs || bhs.length === 0) return ''
     return bhs.map(b => b.name).join(', ')
 }
@@ -51,9 +62,19 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
     const [detailId, setDetailId] = React.useState<number | undefined>(undefined)
     const [deleteRow, setDeleteRow] = React.useState<{ id: number; name: string } | null>(null)
 
-    // --- Sorting state ---
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof CatRow>('name')
+
+    const qc = useQueryClient()
+    const [isAuthed, setIsAuthed] = React.useState<boolean>(!!getToken())
+    React.useEffect(() => {
+        const onAuthChanged = () => {
+            setIsAuthed(!!getToken())
+            qc.invalidateQueries({queryKey: ['cats']})
+        }
+        window.addEventListener('auth-changed', onAuthChanged)
+        return () => window.removeEventListener('auth-changed', onAuthChanged)
+    }, [qc])
 
     const handleRequestSort = (property: keyof CatRow) => {
         const isAsc = orderBy === property && order === 'asc'
@@ -97,17 +118,10 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
     }, [data, order, orderBy])
 
     if (isLoading) return <CircularProgress/>
-    if (isError)   return <Alert severity="error">{(error as Error)?.message ?? 'Failed to load cats'}</Alert>
+    if (isError) return <Alert severity="error">{(error as Error)?.message ?? 'Failed to load cats'}</Alert>
 
     return (
         <>
-            <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-                <div />
-                <Button startIcon={<AddIcon />} variant="contained" onClick={() => { setEditRow(null); setOpenForm(true) }}>
-                    New Cat
-                </Button>
-            </Stack>
-
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableHead>
@@ -165,19 +179,22 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
                                 <TableCell>{c.behaviours?.length ? c.behaviours.map(b => b.name).join(', ') : '—'}</TableCell>
                                 <TableCell align="right">
                                     <Tooltip title="Details">
-                                        <IconButton onClick={() => setDetailId((c as any).id)}><InfoIcon /></IconButton>
+                                        <IconButton onClick={() => setDetailId((c as any).id)}><InfoIcon/></IconButton>
                                     </Tooltip>
-                                    <Tooltip title="Edit">
-                                        <IconButton onClick={() => { setEditRow(c as any); setOpenForm(true) }}><EditIcon /></IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete">
+                                    {isAuthed && (<Tooltip title="Edit">
+                                        <IconButton onClick={() => {
+                                            setEditRow(c as any);
+                                            setOpenForm(true)
+                                        }}><EditIcon/></IconButton>
+                                    </Tooltip>)}
+                                    {isAuthed && (<Tooltip title="Delete">
                                         <IconButton
                                             color="error"
-                                            onClick={() => setDeleteRow({ id: (c as any).id, name: c.name })}
+                                            onClick={() => setDeleteRow({id: (c as any).id, name: c.name})}
                                         >
-                                            <DeleteIcon />
+                                            <DeleteIcon/>
                                         </IconButton>
-                                    </Tooltip>
+                                    </Tooltip>)}
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -186,7 +203,6 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
                 </Table>
             </TableContainer>
 
-            {/* Create / Edit */}
             <CatFormDialog
                 open={openForm}
                 onClose={() => setOpenForm(false)}
@@ -196,11 +212,7 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
                     birthDate: editRow.birthDate ?? null
                 } : undefined}
             />
-
-            {/* Details */}
-            <CatDetailDrawer id={detailId} open={!!detailId} onClose={() => setDetailId(undefined)} />
-
-            {/* Confirm Delete */}
+            <CatDetailDrawer id={detailId} open={!!detailId} onClose={() => setDetailId(undefined)}/>
             <ConfirmDeleteDialog
                 open={!!deleteRow}
                 name={deleteRow?.name}
@@ -216,6 +228,17 @@ export function CatsTable(props: { breedid?: number; behaviourid?: number }) {
                     }
                 }}
             />
+            <Stack direction="row" justifyContent="space-between" sx={{mb: 1}} paddingTop={1}>
+                <div/>
+                {isAuthed && (
+                    <Button startIcon={<AddIcon/>} variant="contained" onClick={() => {
+                        setEditRow(null);
+                        setOpenForm(true)
+                    }}>
+                        New Cat
+                    </Button>
+                )}
+            </Stack>
         </>
     )
 }

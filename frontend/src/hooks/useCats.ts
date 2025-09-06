@@ -1,4 +1,5 @@
 import {useQuery} from '@tanstack/react-query'
+import {authHeader} from "../auth"
 
 export interface BehaviourItem {
     name: string
@@ -45,7 +46,7 @@ export function useCats({breedid, behaviourid}: UseCatsArgs) {
     return useQuery<CatItem[], Error>({
         queryKey: ['cats', breedid ?? null, behaviourid ?? null],
         queryFn: async () => {
-            const res = await fetch(url, {headers: {Accept: 'application/json'}})
+            const res = await fetch(url, {headers: {Accept: 'application/json', ...authHeader()}})
             if (!res.ok) {
                 const text = await res.text().catch(() => '')
                 throw new Error(`Failed to load cats (${res.status}): ${text || res.statusText}`)

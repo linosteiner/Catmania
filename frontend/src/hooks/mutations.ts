@@ -1,4 +1,5 @@
 import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {authHeader} from "../auth.ts";
 
 export interface CreateCatPayload {
     name: string
@@ -10,10 +11,10 @@ export interface CreateCatPayload {
 export interface UpdateCatPayload extends Partial<CreateCatPayload> {
 }
 
-async function doJson<T>(url: string, method: string, body?: any): Promise<T> {
+export async function doJson<T>(url: string, method: string, body?: any): Promise<T> {
     const res = await fetch(url, {
         method,
-        headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...authHeader() }, // <-- add
         body: body ? JSON.stringify(body) : undefined
     })
     if (!res.ok) {

@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material'
-import { Container, Typography, IconButton, Stack, Tooltip } from '@mui/material'
+import {Container, createTheme, CssBaseline, IconButton, Stack, ThemeProvider, Tooltip, Typography} from '@mui/material'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
-import { CatsTable } from './components/CatsTable'
+import {CatsTable} from './components/CatsTable'
+import LoginButton from "./components/LoginButton.tsx";
 
 type Mode = 'light' | 'dark'
 
@@ -36,7 +36,7 @@ function useDarkMode(): [Mode, () => void] {
 
 export default function App() {
     const [mode, toggleMode] = useDarkMode()
-    const theme = React.useMemo(() => createTheme({ palette: { mode } }), [mode])
+    const theme = React.useMemo(() => createTheme({palette: {mode}}), [mode])
 
     const [filters] = React.useState({
         breedid: undefined as number | undefined,
@@ -45,17 +45,22 @@ export default function App() {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Container sx={{ py: 3 }}>
+            <CssBaseline/>
+            <Container sx={{py: 3}}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="h4" gutterBottom>Catmania</Typography>
-                    <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-                        <IconButton onClick={toggleMode} size="large">
-                            {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-                        </IconButton>
-                    </Tooltip>
+
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                            <IconButton onClick={toggleMode} size="large">
+                                {mode === 'dark' ? <LightModeIcon/> : <DarkModeIcon/>}
+                            </IconButton>
+                        </Tooltip>
+                        <LoginButton/>
+                    </Stack>
                 </Stack>
-                <CatsTable breedid={filters.breedid} behaviourid={filters.behaviourid} />
+
+                <CatsTable breedid={filters.breedid} behaviourid={filters.behaviourid}/>
             </Container>
         </ThemeProvider>
     )

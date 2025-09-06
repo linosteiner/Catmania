@@ -4,6 +4,8 @@ import ch.linosteiner.catmania.entities.Behaviour;
 import ch.linosteiner.catmania.repositories.BehaviourRepository;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class BehaviourController {
         this.repo = repo;
     }
 
+    @Secured(SecurityRule.IS_ANONYMOUS)
     @Get
     public List<Behaviour> list() {
         return repo.findAll();
