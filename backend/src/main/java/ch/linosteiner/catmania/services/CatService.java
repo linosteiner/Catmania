@@ -67,17 +67,17 @@ public class CatService {
         cat.setName(request.name());
         cat.setBirthDate(request.birthDate());
 
-        if (request.id_breed() != null) {
-            Breed breed = breedRepository.findById(request.id_breed())
+        if (request.fkBreed() != null) {
+            Breed breed = breedRepository.findById(request.fkBreed())
                     .orElseThrow(() -> new HttpStatusException(HttpStatus.BAD_REQUEST,
-                            "Unknown breed: %d".formatted(request.id_breed())));
+                            "Unknown breed: %d".formatted(request.fkBreed())));
             cat.setBreed(breed);
         }
         cat = catRepository.save(cat);
         if (request.behaviourIds() != null && !request.behaviourIds().isEmpty()) {
             for (Long behaviour : request.behaviourIds()) {
                 assertBehaviourExists(behaviour);
-                catBehaviourRepository.save(new CatBehaviour(cat.getId(), behaviour));
+                catBehaviourRepository.add(cat.getId(), behaviour);
             }
         }
         return cat;
@@ -107,12 +107,15 @@ public class CatService {
         cat = catRepository.update(cat);
 
         if (request.behaviourIds() != null) {
-            for (Long behaviourId : request.behaviourIds()) {
-                assertBehaviourExists(behaviourId);
-                catBehaviourRepository.add(cat.getId(), behaviourId);
+            catBehaviourRepository.deleteAllByCatId(cat.getId());
+
+            if (!request.behaviourIds().isEmpty()) {
+                for (Long behaviourId : new java.util.LinkedHashSet<>(request.behaviourIds())) {
+                    assertBehaviourExists(behaviourId);
+                    catBehaviourRepository.add(cat.getId(), behaviourId);
+                }
             }
         }
-
         return cat;
     }
 

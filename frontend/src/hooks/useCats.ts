@@ -1,11 +1,15 @@
-import { useQuery } from '@tanstack/react-query'
+import {useQuery} from '@tanstack/react-query'
 
-export interface BehaviourItem { name: string }
+export interface BehaviourItem {
+    name: string
+}
+
 export interface CatItem {
+    id: number
     name: string
     birthDate?: string | null
     breedName?: string | null
-    behaviours: BehaviourItem[]
+    behaviours: { name: string }[]
 }
 
 type UseCatsArgs = { breedid?: number; behaviourid?: number }
@@ -20,13 +24,19 @@ function mapCat(raw: any): CatItem {
 
     const behaviours: BehaviourItem[] = Array.isArray(behavioursRaw)
         ? behavioursRaw.map((b: any) =>
-            typeof b === 'string' ? { name: b } : { name: b?.name })
+            typeof b === 'string' ? {name: b} : {name: b?.name})
         : []
 
-    return { name: raw.name, birthDate, breedName, behaviours }
+    return {
+        id: Number(raw.id ?? raw.pk ?? 0),
+        name: raw.name,
+        birthDate,
+        breedName,
+        behaviours
+    }
 }
 
-export function useCats({ breedid, behaviourid }: UseCatsArgs) {
+export function useCats({breedid, behaviourid}: UseCatsArgs) {
     const params = new URLSearchParams()
     if (breedid != null) params.set('breedId', String(breedid))
     if (behaviourid != null) params.set('behaviourId', String(behaviourid))
@@ -35,7 +45,7 @@ export function useCats({ breedid, behaviourid }: UseCatsArgs) {
     return useQuery<CatItem[], Error>({
         queryKey: ['cats', breedid ?? null, behaviourid ?? null],
         queryFn: async () => {
-            const res = await fetch(url, { headers: { Accept: 'application/json' } })
+            const res = await fetch(url, {headers: {Accept: 'application/json'}})
             if (!res.ok) {
                 const text = await res.text().catch(() => '')
                 throw new Error(`Failed to load cats (${res.status}): ${text || res.statusText}`)

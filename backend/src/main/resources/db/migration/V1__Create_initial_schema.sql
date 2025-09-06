@@ -129,10 +129,10 @@ VALUES (LEAST((SELECT id FROM cat WHERE name = 'Luna'), (SELECT id FROM cat WHER
         GREATEST((SELECT id FROM cat WHERE name = 'Simba'), (SELECT id FROM cat WHERE name = 'Sasha')))
 ON CONFLICT DO NOTHING;
 
-CREATE INDEX idx_cat_breed_id ON cat (breed_id);
-CREATE INDEX idx_catbeh_behaviour_id ON cat_behaviour (behaviour_id);
-CREATE INDEX idx_catfriend_cat_id ON cat_friendship (cat_id);
-CREATE INDEX idx_catfriend_friend_id ON cat_friendship (friend_id);
-CREATE INDEX idx_cat_created_at ON cat (created_at);
-CREATE INDEX idx_cat_birth_date ON cat (birth_date);
-CREATE INDEX idx_cat_breed_id_id ON cat (breed_id, id);
+CREATE INDEX IF NOT EXISTS idx_cat_breed_id ON cat (breed_id);
+CREATE INDEX IF NOT EXISTS  idx_catbeh_behaviour_id ON cat_behaviour (behaviour_id);
+CREATE INDEX IF NOT EXISTS  idx_catfriend_cat_id ON cat_friendship (cat_id);
+CREATE INDEX IF NOT EXISTS  idx_catfriend_friend_id ON cat_friendship (friend_id);
+CREATE INDEX IF NOT EXISTS  idx_cat_created_at ON cat (created_at);
+CREATE INDEX IF NOT EXISTS  idx_cat_birth_date ON cat (birth_date);
+CREATE INDEX IF NOT EXISTS  idx_cat_breed_id_id ON cat (breed_id, id);

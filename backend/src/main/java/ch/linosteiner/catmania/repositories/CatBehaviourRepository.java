@@ -38,4 +38,7 @@ public interface CatBehaviourRepository extends CrudRepository<CatBehaviour, Cat
 
     @Query("DELETE FROM cat_behaviour WHERE cat_id = :catId")
     void deleteByCatId(Long catId);
+
+    @Query("DELETE FROM cat_behaviour WHERE cat_id = :catId")
+    void deleteAllByCatId(Long catId);
 }
