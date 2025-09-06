@@ -1,6 +1,4 @@
-CREATE UNIQUE INDEX IF NOT EXISTS ux_cat_name ON cat (name);
-CREATE UNIQUE INDEX IF NOT EXISTS ux_breed_name ON breed (name);
-CREATE UNIQUE INDEX IF NOT EXISTS ux_behaviour_name ON behaviour (name);
+TRUNCATE TABLE cat_friendship, cat_behaviour, cat RESTART IDENTITY CASCADE;
 
 INSERT INTO breed (name)
 VALUES ('Siamese'),
@@ -19,15 +17,15 @@ ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO behaviour (name)
 VALUES ('Friendly'),
-       ('Playful'),
-       ('Independent'),
-       ('Lazy'),
        ('Sassy'),
+       ('Playful'),
+       ('Lazy'),
        ('Curious'),
+       ('Independent'),
+       ('Affectionate'),
        ('Vocal'),
        ('Shy'),
-       ('Energetic'),
-       ('Affectionate')
+       ('Energetic')
 ON CONFLICT (name) DO NOTHING;
 
 WITH seed(name, birth_date, breed_name) AS (VALUES ('Luna', DATE '2020-05-14', 'Siamese'),
@@ -53,60 +51,49 @@ ON CONFLICT (name) DO UPDATE
     SET birth_date = EXCLUDED.birth_date,
         breed_id   = EXCLUDED.breed_id;
 
-WITH pairs(cat_name, behaviour_name) AS (
-    VALUES
-        ('Luna','Friendly'),
-        ('Luna','Playful'),
-        ('Milo','Lazy'),
-        ('Milo','Independent'),
-        ('Cleo','Sassy'),
-        ('Simba','Curious'),
-        ('Nala','Playful'),
-        ('Oliver','Lazy'),
-        ('Oliver','Affectionate'),
-        ('Chloe','Friendly'),
-        ('Chloe','Vocal'),
-        ('Leo','Independent'),
-        ('Misty','Shy'),
-        ('Tiger','Energetic'),
-        ('Sasha','Affectionate'),
-        ('Charlie','Curious')
-),
-     resolved AS (
-         SELECT c.id AS cat_id, b.id AS behaviour_id
-         FROM pairs p
-                  JOIN cat       c ON c.name = p.cat_name
-                  JOIN behaviour b ON b.name = p.behaviour_name
-     )
-INSERT INTO cat_behaviour (cat_id, behaviour_id)
+WITH pairs(cat_name, behaviour_name) AS (VALUES ('Luna', 'Friendly'),
+                                                ('Luna', 'Playful'),
+                                                ('Milo', 'Lazy'),
+                                                ('Milo', 'Independent'),
+                                                ('Cleo', 'Sassy'),
+                                                ('Simba', 'Curious'),
+                                                ('Nala', 'Playful'),
+                                                ('Oliver', 'Lazy'),
+                                                ('Oliver', 'Affectionate'),
+                                                ('Chloe', 'Friendly'),
+                                                ('Chloe', 'Vocal'),
+                                                ('Leo', 'Independent'),
+                                                ('Misty', 'Shy'),
+                                                ('Tiger', 'Energetic'),
+                                                ('Sasha', 'Affectionate'),
+                                                ('Charlie', 'Curious')),
+     resolved AS (SELECT c.id AS cat_id, b.id AS behaviour_id
+                  FROM pairs p
+                           JOIN cat c ON c.name = p.cat_name
+                           JOIN behaviour b ON b.name = p.behaviour_name)
+INSERT
+INTO cat_behaviour (cat_id, behaviour_id)
 SELECT cat_id, behaviour_id
 FROM resolved
 ON CONFLICT DO NOTHING;
 
-WITH name_pairs(a_name, b_name) AS (
-    VALUES
-        ('Luna','Milo'),
-        ('Luna','Cleo'),
-        ('Milo','Simba'),
-        ('Cleo','Nala'),
-        ('Oliver','Chloe'),
-        ('Leo','Misty'),
-        ('Tiger','Sasha'),
-        ('Charlie','Luna'),
-        ('Charlie','Milo'),
-        ('Simba','Sasha')
-),
-     id_pairs AS (
-         SELECT ca.id AS a, cb.id AS b
-         FROM name_pairs np
-                  JOIN cat ca ON ca.name = np.a_name
-                  JOIN cat cb ON cb.name = np.b_name
-     ),
-     normalized AS (
-         SELECT LEAST(a,b) AS cat_id, GREATEST(a,b) AS friend_id
-         FROM id_pairs
-     )
-INSERT INTO cat_friendship (cat_id, friend_id)
+WITH name_pairs(a_name, b_name) AS (VALUES ('Luna', 'Milo'),
+                                           ('Luna', 'Cleo'),
+                                           ('Milo', 'Simba'),
+                                           ('Cleo', 'Nala'),
+                                           ('Oliver', 'Chloe'),
+                                           ('Leo', 'Misty'),
+                                           ('Tiger', 'Sasha'),
+                                           ('Charlie', 'Luna'),
+                                           ('Charlie', 'Milo'),
+                                           ('Simba', 'Sasha')),
+     id_pairs AS (SELECT ca.id AS a, cb.id AS b
+                  FROM name_pairs np
+                           JOIN cat ca ON ca.name = np.a_name
+                           JOIN cat cb ON cb.name = np.b_name),
+     normalized AS (SELECT LEAST(a, b) AS cat_id, GREATEST(a, b) AS friend_id FROM id_pairs)
+INSERT
+INTO cat_friendship (cat_id, friend_id)
 SELECT cat_id, friend_id
 FROM normalized
 ON CONFLICT DO NOTHING;
