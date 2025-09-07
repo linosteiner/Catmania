@@ -1,2 +1,0 @@
-# Catmania
-## Manage those cats!
