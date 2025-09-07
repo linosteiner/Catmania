@@ -44,7 +44,7 @@ Project overview
 - Access UI at:
     - [http://localhost:5173](http://localhost:5173)
 - The default Login User for the UI is:
-    - Username: test
+    - Username: user
     - Password: secret123
 
 ## 3. Database
