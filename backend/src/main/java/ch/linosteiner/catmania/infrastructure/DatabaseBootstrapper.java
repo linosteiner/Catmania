@@ -17,12 +17,12 @@ import java.sql.Statement;
 @Singleton
 @Context
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class DataBaseBootstrapper {
+public class DatabaseBootstrapper {
     private static final String TARGET_DB = "catmania";
     private static final String OWNER = System.getenv().getOrDefault("PGUSER", "postgres");
     private final DataSource dataSource;
 
-    public DataBaseBootstrapper(@Named("bootstrap") DataSource dataSource) {
+    public DatabaseBootstrapper(@Named("bootstrap") DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
